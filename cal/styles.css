@@ -1,0 +1,293 @@
+/* Glassy Search / Go-To inputs */
+.calendar .goto-today .goto input,
+.add-event-body .add-event-input input {
+    background: rgba(255, 255, 255, 0.08); /* light frosted overlay */
+    border: 1px solid rgba(179, 138, 221, 0.4);
+    color: #f2f2f7;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    padding: 8px 14px;
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+}
+
+/* Placeholder color */
+.calendar .goto-today .goto input::placeholder,
+.add-event-body .add-event-input input::placeholder {
+    color: rgba(240, 240, 255, 0.5);
+}
+
+/* On focus */
+.calendar .goto-today .goto input:focus,
+.add-event-body .add-event-input input:focus {
+    outline: none;
+    border-color: var(--primary-clr);
+    box-shadow: 0 0 12px rgba(179, 138, 221, 0.6);
+    background: rgba(179, 138, 221, 0.12);
+}
+
+/* Glassy Go-To button */
+.calendar .goto-today .goto button {
+    background: rgba(179, 138, 221, 0.15);
+    border: 1px solid rgba(179, 138, 221, 0.4);
+    color: #fff;
+    padding: 8px 14px;
+    font-weight: 600;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
+    transition: all 0.3s ease;
+}
+.calendar .goto-today .goto button:hover {
+    background: rgba(179, 138, 221, 0.3);
+    box-shadow: 0 0 15px rgba(179, 138, 221, 0.5);
+}
+:root {
+  --primary-clr: #b38add;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #1c1c1c;
+  border-radius: 50px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary-clr);
+  border-radius: 50px;
+}
+
+/* Body */
+body {
+  position: relative;
+  min-height: 100vh;
+  background-color: #1b1b1f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  overflow: hidden;
+}
+
+/* Container */
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 1200px;
+  height: 100%;
+  max-height: 850px;
+  color: #fff;
+  border-radius: 12px;
+  background-color: #2a2a35;
+  overflow: hidden;
+}
+
+/* Left side */
+.left {
+  flex: 3;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Calendar */
+.calendar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  color: #aaa;
+  border-radius: 8px;
+  background-color: #1e1e28;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+/* Month Navigation */
+.calendar .month {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+.calendar .month .prev,
+.calendar .month .next {
+  cursor: pointer;
+  color: #aaa;
+  transition: color 0.3s ease;
+}
+.calendar .month .prev:hover,
+.calendar .month .next:hover {
+  color: var(--primary-clr);
+}
+
+/* Weekdays */
+.calendar .weekdays {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  font-size: 0.9rem;
+  color: #bbb;
+}
+
+/* Days grid */
+.calendar .days {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10px;
+}
+.calendar .days .day {
+  width: calc(100% / 7);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-clr);
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.calendar .days .day:hover {
+  background-color: var(--primary-clr);
+  color: #fff;
+  border-radius: 6px;
+}
+
+/* Today */
+.calendar .days .today {
+  background-color: var(--primary-clr);
+  color: #fff;
+  border-radius: 6px;
+}
+
+/* Right side */
+.right {
+  flex: 2;
+  background-color: #23232d;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Today’s date info */
+.right .today-date {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.today-date .event-day {
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+.today-date .event-date {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+/* Events list */
+.events {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+.events .event {
+  padding: 12px;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #3f4458, transparent);
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+.events .event:hover {
+  background: linear-gradient(90deg, var(--primary-clr), transparent);
+}
+
+/* Add Event Button */
+.add-event {
+  position: sticky;
+  bottom: 15px;
+  align-self: flex-end;
+  background: transparent;
+  color: #aaa;
+  border: 2px solid #aaa;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.add-event:hover {
+  border-color: var(--primary-clr);
+  color: var(--primary-clr);
+}
+
+/* Mobile responsiveness */
+@media screen and (max-width: 900px) {
+  .container {
+    flex-direction: column;
+    height: 100%;
+    max-height: none;
+  }
+  .left, .right {
+    flex: unset;
+    width: 100%;
+  }
+}
+/* Search / Go-To inputs */
+.calendar .goto-today .goto input,
+.add-event-body .add-event-input input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(179, 138, 221, 0.3);
+    color: #e6e6f0;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    padding: 6px 12px;
+    transition: all 0.25s ease;
+}
+
+/* Placeholder color */
+.calendar .goto-today .goto input::placeholder,
+.add-event-body .add-event-input input::placeholder {
+    color: rgba(230, 230, 240, 0.5);
+}
+
+/* On focus */
+.calendar .goto-today .goto input:focus,
+.add-event-body .add-event-input input:focus {
+    outline: none;
+    border-color: var(--primary-clr);
+    box-shadow: 0 0 8px rgba(179, 138, 221, 0.5);
+    background: rgba(179, 138, 221, 0.08);
+}
+
+/* Go-To button */
+.calendar .goto-today .goto button {
+    background: linear-gradient(135deg, var(--primary-clr), #8f5fd3);
+    border: none;
+    color: #fff;
+    padding: 6px 12px;
+    font-weight: 600;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+.calendar .goto-today .goto button:hover {
+    background: linear-gradient(135deg, #8f5fd3, var(--primary-clr));
+    box-shadow: 0 0 10px rgba(179, 138, 221, 0.4);
+}

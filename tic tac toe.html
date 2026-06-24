@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* Dark Mode Design */
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #121212;
+            color: white;
+        }
+
+        .game-container {
+            text-align: center;
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 40px;
+            width: 350px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #333;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            color: white;
+        }
+
+        .cell:hover {
+            background-color: #444;
+            transform: scale(1.1);
+        }
+
+        .reset-btn {
+            padding: 12px 25px;
+            font-size: 1.2em;
+            cursor: pointer;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            transition: background-color 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background-color: #3700b3;
+        }
+
+        .reset-btn:focus {
+            outline: none;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #f0f0f0;
+        }
+
+        .message span {
+            font-weight: bold;
+            color: #6200ea;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Tic-Tac-Toe</h1>
+        <div id="board" class="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+        <button id="reset" class="reset-btn">Reset</button>
+        <div id="message" class="message"></div>
+    </div>
+
+    <script>
+        let currentPlayer = 'X';
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+        let isGameActive = true;
+
+        const cells = document.querySelectorAll('.cell');
+        const resetButton = document.getElementById('reset');
+        const message = document.getElementById('message');
+
+        const checkWinner = () => {
+            const winningCombinations = [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [2, 4, 6]
+            ];
+
+            for (const combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+                    // Winner found, trigger confetti and show alert
+                    confetti(); // Launch confetti
+                    alert(`${currentPlayer} wins!`);
+                    message.innerHTML = `<span>${currentPlayer}</span> wins!`;
+                    isGameActive = false;
+                    return;
+                }
+            }
+
+            if (!gameBoard.includes('')) {
+                message.innerHTML = "It's a draw!";
+                isGameActive = false;
+            }
+        };
+
+        const handleClick = (index) => {
+            if (!isGameActive || gameBoard[index] !== '') return;
+            
+            gameBoard[index] = currentPlayer;
+            cells[index].textContent = currentPlayer;
+            checkWinner();
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        };
+
+        const resetGame = () => {
+            gameBoard = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            isGameActive = true;
+            cells.forEach(cell => cell.textContent = '');
+            message.innerHTML = '';
+        };
+
+        cells.forEach(cell => {
+            cell.addEventListener('click', (event) => {
+                const index = event.target.getAttribute('data-index');
+                handleClick(index);
+            });
+        });
+
+        resetButton.addEventListener('click', resetGame);
+
+        // Function to trigger confetti animation
+        function confetti() {
+            setTimeout(() => {
+                confetti({
+                    particleCount: 200,
+                    spread: 70,
+                    origin: { x: 0.5, y: 0.5 }
+                });
+            }, 500); // Delay confetti for better effect
+        }
+    </script>
+
+</body>
+</html>

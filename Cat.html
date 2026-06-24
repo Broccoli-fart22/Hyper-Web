@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Modern Dark Sudoku</title>
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --panel:#0f1720;
+      --muted:#9aa6b2;
+      --accent:#7c5cff;
+      --accent-2:#29d1a0;
+      --cell:#0b1520;
+      --cell-border:#18222b;
+      --highlight:#13212b;
+      --error:#ff6b6b;
+      --glow:0 8px 24px rgba(124,92,255,0.12);
+      --radius:12px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,var(--bg),#071017 120%);
+      color:#e6eef6;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;align-items:center;justify-content:center;padding:28px;
+    }
+
+    .app{
+      width:100%;max-width:1000px;background:linear-gradient(180deg,var(--panel),#08121a);
+      border-radius:var(--radius);padding:20px;box-shadow:var(--glow);display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start;
+    }
+
+    .left{
+      padding:18px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:10px;min-height:420px;
+    }
+
+    .title{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .logo{width:48px;height:48px;background:linear-gradient(135deg,var(--accent),#5ac7ff);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#051019}
+    .title h1{font-size:18px;margin:0}
+    .title p{margin:0;font-size:12px;color:var(--muted)}
+
+    .controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    button, .select{background:transparent;border:1px solid rgba(255,255,255,0.06);color:inherit;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:13px}
+    button.primary{background:linear-gradient(90deg,var(--accent),#5ac7ff);color:#061223;border:box-shadow:var(--glow)}
+    .small{padding:6px 8px;font-size:12px}
+
+    .stats{margin-top:14px;font-size:13px;color:var(--muted);display:flex;gap:12px}
+    .stat{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px}
+
+    .board-wrap{display:flex;align-items:center;justify-content:center;padding:18px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)}
+
+    .board{
+      width:460px;height:460px;display:grid;grid-template-columns:repeat(9,1fr);grid-template-rows:repeat(9,1fr);gap:0;border-radius:10px;padding:6px;background:linear-gradient(180deg,#08161c,#051017);
+    }
+
+    .cell{
+      background:var(--cell);border:1px solid var(--cell-border);display:flex;align-items:center;justify-content:center;position:relative;font-size:20px;font-weight:600;color:#dff3ff;user-select:none;cursor:default;
+    }
+    .cell input{position:absolute;inset:0;border:0;background:transparent;color:inherit;font-size:20px;font-weight:600;text-align:center}
+    .cell.prefilled{color:#9dd7ff;font-weight:700}
+    .cell.highlight{background:var(--highlight)}
+    .cell.error{background:linear-gradient(90deg, rgba(255,107,107,0.08), transparent);border-color:rgba(255,107,107,0.25)}
+
+    /* Thicker borders for 3x3 boxes */
+    .cell[data-row="0"],.cell[data-row="1"],.cell[data-row="2"]{ }
+    /* we'll use :nth-child to add thick borders */
+    .board .cell:nth-child(3n){border-right:2px solid rgba(255,255,255,0.06)}
+    .board .cell:nth-child(n + 19):nth-child(-n + 27),
+    .board .cell:nth-child(n + 46):nth-child(-n + 54){ /* middle horizontal separators */ }
+
+    /* Draw vertical thick lines */
+    .cell.v-sep{border-right:2px solid rgba(255,255,255,0.06)}
+
+    .notes{position:absolute;inset:6px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);font-size:9px;color:var(--muted);align-items:start;justify-items:center}
+
+    .keypad{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .key{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;background:transparent;border:1px solid rgba(255,255,255,0.04);cursor:pointer}
+
+    .footer{margin-top:14px;font-size:12px;color:var(--muted)}
+
+    /* responsive */
+    @media (max-width:880px){
+      .app{grid-template-columns:1fr;max-width:640px}
+      .board{width:360px;height:360px}
+    }
+
+    /* tiny helper */
+    .controls .spacer{flex:1}
+    .muted{color:var(--muted)}
+
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="Sudoku">
+    <div class="left">
+      <div class="title">
+        <div class="logo">S</div>
+        <div>
+          <h1>Modern Dark Sudoku</h1>
+          <p>Elegant, keyboard-friendly Sudoku — By HyperWeb</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="newBtn" class="small">New</button>
+        <select id="difficulty" class="select small">
+          <option value="easy">Easy</option>
+          <option value="medium" selected>Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+        <button id="hintBtn" class="small">Hint</button>
+        <button id="solveBtn" class="small">Solve</button>
+        <button id="checkBtn" class="small">Check</button>
+        <div class="spacer"></div>
+        <button id="notesToggle" class="small">Notes: Off</button>
+        <button id="eraseBtn" class="small">Erase</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat">Time: <span id="time">0:00</span></div>
+        <div class="stat">Errors: <span id="errors">0</span></div>
+        <div class="stat">Difficulty: <span id="curDiff">Medium</span></div>
+      </div>
+
+      <div style="margin-top:16px;font-size:13px;color:var(--muted)">
+        Controls: Click cells or use number keys. Press 0 or Backspace to erase. Toggle Notes to add pencil marks.
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
+        <div class="keypad" id="keypad">
+          <div class="key">1</div>
+          <div class="key">2</div>
+          <div class="key">3</div>
+          <div class="key">4</div>
+          <div class="key">5</div>
+          <div class="key">6</div>
+          <div class="key">7</div>
+          <div class="key">8</div>
+          <div class="key">9</div>
+        </div>
+      </div>
+
+      <div class="footer">Enjoy! (No tracking — runs entirely in your browser)</div>
+    </div>
+
+    <div class="board-wrap">
+      <div class="board" id="board" tabindex="0" aria-label="Sudoku board"></div>
+    </div>
+  </div>
+
+<script>
+// Sudoku engine: generator, solver, UI wiring
+
+const boardEl = document.getElementById('board');
+const newBtn = document.getElementById('newBtn');
+const difficultyEl = document.getElementById('difficulty');
+const notesToggle = document.getElementById('notesToggle');
+const hintBtn = document.getElementById('hintBtn');
+const solveBtn = document.getElementById('solveBtn');
+const checkBtn = document.getElementById('checkBtn');
+const eraseBtn = document.getElementById('eraseBtn');
+const timeEl = document.getElementById('time');
+const errorsEl = document.getElementById('errors');
+const curDiffEl = document.getElementById('curDiff');
+const keypad = document.getElementById('keypad');
+
+let notesMode = false;
+let selectedCell = null;
+let puzzle = null; // 9x9 arr with 0 for empty
+let solution = null; // solved board
+let prefilled = new Set();
+let timer = null; let seconds = 0;
+let errors = 0;
+
+function makeBoardUI(){
+  boardEl.innerHTML = '';
+  for(let r=0;r<9;r++){
+    for(let c=0;c<9;c++){
+      const idx = r*9 + c;
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.r = r; cell.dataset.c = c; cell.dataset.idx = idx;
+      // thicker borders
+      if(c%3===2) cell.style.borderRightWidth = '2px';
+      if(r%3===2) cell.style.borderBottomWidth = '2px';
+      const input = document.createElement('input');
+      input.inputMode = 'numeric';
+      input.maxLength = 1;
+      input.tabIndex = -1;
+      cell.appendChild(input);
+      const notes = document.createElement('div'); notes.className='notes';
+      cell.appendChild(notes);
+      cell.addEventListener('click', ()=>selectCell(cell));
+      boardEl.appendChild(cell);
+    }
+  }
+}
+
+function selectCell(cell){
+  if(selectedCell) selectedCell.classList.remove('selected');
+  selectedCell = cell;
+  cell.classList.add('selected');
+  // highlight row/col/box
+  document.querySelectorAll('.cell').forEach(c=>c.classList.remove('highlight'));
+  const r = +cell.dataset.r, c = +cell.dataset.c;
+  document.querySelectorAll('.cell').forEach(cc=>{
+    const rr = +cc.dataset.r, cc2 = +cc.dataset.c;
+    if(rr===r || cc2===c || (Math.floor(rr/3)===Math.floor(r/3) && Math.floor(cc2/3)===Math.floor(c/3))) cc.classList.add('highlight');
+  });
+}
+
+function render(){
+  for(let r=0;r<9;r++){
+    for(let c=0;c<9;c++){
+      const idx = r*9+c;
+      const cell = boardEl.children[idx];
+      const input = cell.querySelector('input');
+      const notes = cell.querySelector('.notes');
+      const val = puzzle[r][c];
+      if(val!==0){
+        input.value = val;
+        input.style.opacity = 1;
+      } else { input.value = '' }
+      if(prefilled.has(idx)){
+        cell.classList.add('prefilled');
+      } else cell.classList.remove('prefilled');
+      // notes rendering
+      notes.innerHTML = '';
+      const nset = cell._notes || new Set();
+      for(let n=1;n<=9;n++){
+        const s = document.createElement('div'); s.textContent = n;
+        if(!nset.has(n)) s.style.opacity = 0.03;
+        notes.appendChild(s);
+      }
+      // errors
+      cell.classList.remove('error');
+      if(val!==0 && solution && val !== solution[r][c]) cell.classList.add('error');
+    }
+  }
+}
+
+// UTIL: deep copy
+function copyBoard(b){ return b.map(r=>r.slice()); }
+
+// Solver & generator (backtracking)
+function findEmpty(b){
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++) if(b[r][c]===0) return [r,c];
+  return null;
+}
+
+function isValid(b,r,c,val){
+  for(let i=0;i<9;i++) if(b[r][i]===val) return false;
+  for(let i=0;i<9;i++) if(b[i][c]===val) return false;
+  const br = Math.floor(r/3)*3, bc = Math.floor(c/3)*3;
+  for(let i=0;i<3;i++) for(let j=0;j<3;j++) if(b[br+i][bc+j]===val) return false;
+  return true;
+}
+
+function solverCount(b, limit=2){
+  const pos = findEmpty(b);
+  if(!pos) return 1;
+  let total = 0;
+  const [r,c]=pos;
+  for(let v=1;v<=9;v++){
+    if(isValid(b,r,c,v)){
+      b[r][c]=v;
+      total += solverCount(b, limit);
+      if(total>=limit){ b[r][c]=0; return total; }
+      b[r][c]=0;
+    }
+  }
+  return total;
+}
+
+function solve(b){
+  const pos = findEmpty(b);
+  if(!pos) return true;
+  const [r,c]=pos;
+  for(let v=1;v<=9;v++){
+    if(isValid(b,r,c,v)){
+      b[r][c]=v;
+      if(solve(b)) return true;
+      b[r][c]=0;
+    }
+  }
+  return false;
+}
+
+function generateFull(){
+  const b = Array.from({length:9},()=>Array(9).fill(0));
+  // fill diagonal 3x3 blocks with random permutations for speed
+  for(let k=0;k<3;k++){
+    const nums = [1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5);
+    const br = k*3;
+    for(let i=0;i<3;i++) for(let j=0;j<3;j++) b[br+i][br%9 + j] = nums[i*3+j];
+  }
+  // better: backtrack fill everything
+  function fillAll(){
+    const pos = findEmpty(b);
+    if(!pos) return true;
+    const [r,c]=pos;
+    const nums = [1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5);
+    for(const v of nums){
+      if(isValid(b,r,c,v)){
+        b[r][c]=v;
+        if(fillAll()) return true;
+        b[r][c]=0;
+      }
+    }
+    return false;
+  }
+  fillAll();
+  return b;
+}
+
+function makePuzzle(difficulty='medium'){
+  // create full
+  const full = generateFull();
+  const attempts = difficulty==='easy'?35:difficulty==='medium'?45:55; // more removals = harder
+  const puzzle = copyBoard(full);
+  const cells = Array.from({length:81},(_,i)=>i).sort(()=>Math.random()-0.5);
+  let removed=0;
+  for(let i=0;i<cells.length && removed<attempts;i++){
+    const idx = cells[i];
+    const r=Math.floor(idx/9), c=idx%9;
+    const backup = puzzle[r][c];
+    puzzle[r][c]=0;
+    const count = solverCount(copyBoard(puzzle),2);
+    if(count!==1){ // can't remove, revert
+      puzzle[r][c]=backup;
+    } else removed++;
+  }
+  return {puzzle,solution:full};
+}
+
+// Game control
+function startNew(){
+  seconds=0; clearInterval(timer);
+  timer = setInterval(()=>{seconds++; timeEl.textContent = formatTime(seconds)},1000);
+  errors=0; errorsEl.textContent=0;
+  const diff = difficultyEl.value; curDiffEl.textContent = difficultyEl.options[difficultyEl.selectedIndex].text;
+  const g = makePuzzle(diff);
+  puzzle = g.puzzle; solution = g.solution;
+  // mark prefilled
+  prefilled = new Set();
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++) if(puzzle[r][c]!==0) prefilled.add(r*9+c);
+  // clear notes
+  document.querySelectorAll('.cell').forEach(cell=>cell._notes = new Set());
+  render();
+}
+
+function formatTime(s){
+  const mm = Math.floor(s/60), ss = s%60; return `${mm}:${ss.toString().padStart(2,'0')}`;
+}
+
+// UI inputs
+function placeNumber(n){
+  if(!selectedCell) return;
+  const idx = +selectedCell.dataset.idx;
+  if(prefilled.has(idx)) return; // can't change
+  const r=+selectedCell.dataset.r, c=+selectedCell.dataset.c;
+  if(notesMode){
+    if(!selectedCell._notes) selectedCell._notes = new Set();
+    if(selectedCell._notes.has(n)) selectedCell._notes.delete(n); else selectedCell._notes.add(n);
+    render(); return;
+  }
+  // place
+  puzzle[r][c]=n;
+  if(solution && puzzle[r][c] !== solution[r][c]){
+    errors++; errorsEl.textContent=errors; selectedCell.classList.add('error');
+  } else selectedCell.classList.remove('error');
+  // clear notes
+  if(selectedCell._notes) selectedCell._notes.clear();
+  render();
+}
+
+function erase(){
+  if(!selectedCell) return;
+  const idx = +selectedCell.dataset.idx;
+  if(prefilled.has(idx)) return;
+  const r=+selectedCell.dataset.r, c=+selectedCell.dataset.c;
+  puzzle[r][c]=0; if(selectedCell._notes) selectedCell._notes.clear(); render();
+}
+
+// Hint: fill one empty cell correctly
+function hint(){
+  const empties = [];
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++) if(puzzle[r][c]===0) empties.push([r,c]);
+  if(empties.length===0) return;
+  const [r,c] = empties[Math.floor(Math.random()*empties.length)];
+  puzzle[r][c]=solution[r][c]; render();
+}
+
+// Solve: fill all
+function solveAll(){
+  puzzle = copyBoard(solution); render();
+}
+
+// Check (mark wrong cells)
+function checkAll(){
+  let found=false;
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++){
+    const idx = r*9+c; const cell = boardEl.children[idx];
+    if(puzzle[r][c]!==0 && puzzle[r][c] !== solution[r][c]){ cell.classList.add('error'); found=true }
+    else cell.classList.remove('error');
+  }
+  return found;
+}
+
+// Events
+document.addEventListener('keydown', (e)=>{
+  if(e.target.tagName==='INPUT') return; // let input handle
+  if(!selectedCell) return;
+  if(e.key>='1' && e.key<='9'){ placeNumber(+e.key); }
+  else if(e.key==='0' || e.key==='Backspace' || e.key==='Delete'){ erase(); }
+  else if(e.key==='n' && (e.ctrlKey||e.metaKey)){ startNew(); }
+});
+
+keypad.addEventListener('click', (e)=>{
+  const t = e.target; if(t.classList.contains('key')) placeNumber(+t.textContent);
+});
+
+newBtn.addEventListener('click', startNew);
+notesToggle.addEventListener('click', ()=>{ notesMode=!notesMode; notesToggle.textContent = `Notes: ${notesMode?"On":"Off"}`; });
+hintBtn.addEventListener('click', hint);
+solveBtn.addEventListener('click', ()=>{ if(confirm('Reveal the solution?')) solveAll(); });
+checkBtn.addEventListener('click', ()=>{ const wrong = checkAll(); if(!wrong) alert('No mistakes found — good job!'); });
+eraseBtn.addEventListener('click', erase);
+
+// click on board to focus
+boardEl.addEventListener('click', ()=>boardEl.focus());
+
+// create UI then start
+makeBoardUI(); startNew();
+
+// touch / input support: clicking a cell selects it, but we also want to allow typing numbers in the hidden input to support IME (not necessary but included)
+boardEl.querySelectorAll('.cell').forEach(cell=>{
+  const input = cell.querySelector('input');
+  input.addEventListener('input', ()=>{
+    const v = input.value.replace(/[^1-9]/g,'');
+    if(v==='') { erase(); return; }
+    placeNumber(+v[0]);
+    input.value='';
+  });
+  input.addEventListener('focus', ()=>selectCell(cell));
+});
+
+// keyboard navigation with arrows
+document.addEventListener('keydown', (e)=>{
+  if(!selectedCell) return;
+  const r=+selectedCell.dataset.r, c=+selectedCell.dataset.c;
+  let nr=r,nc=c, moved=false;
+  if(e.key==='ArrowUp'){ nr = (r+8)%9; moved=true }
+  if(e.key==='ArrowDown'){ nr = (r+1)%9; moved=true }
+  if(e.key==='ArrowLeft'){ nc = (c+8)%9; moved=true }
+  if(e.key==='ArrowRight'){ nc = (c+1)%9; moved=true }
+  if(moved){
+    const idx = nr*9+nc; selectCell(boardEl.children[idx]); e.preventDefault();
+  }
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Piano</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #fceabb, #f8b500);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .piano {
+      display: grid;
+      grid-template-columns: repeat(24, 1fr);
+      gap: 5px;
+      max-width: 800px;
+      margin-bottom: 30px;
+    }
+
+    .piano button {
+      font-size: 18px;
+      padding: 25px 0;
+      background-color: #fff;
+      border: 2px solid #333;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .piano button:hover {
+      background-color: #ffe58f;
+    }
+
+    .controls {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 500px;
+    }
+
+    .controls label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .controls input[type=range], .controls select {
+      width: 100%;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Piano</h1>
+  <div class="piano" id="piano"></div>
+  <div class="controls">
+    <label>Volume: <input type="range" id="volume" min="0" max="1" step="0.01" value="0.8"></label>
+    <label>Tempo: <input type="range" id="tempo" min="50" max="200" value="100"></label>
+    <label>Pitch: <input type="range" id="pitch" min="-12" max="12" value="0"></label>
+    <label>Instrument:
+      <select id="instrument">
+        <option>Piano</option>
+        <option>Bright Piano</option>
+        <option>Electric Grand</option>
+        <option>Honky-tonk Piano</option>
+        <option>Electric Piano 1</option>
+        <option>Electric Piano 2</option>
+        <option>Harpsichord</option>
+        <option>Clavi</option>
+        <option>Celesta</option>
+        <option>Glockenspiel</option>
+        <option>Music Box</option>
+        <option>Vibraphone</option>
+      </select>
+    </label>
+  </div>
+
+  <script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let volume = 0.8;
+    let tempo = 100;
+    let pitchShift = 0;
+
+    const noteFrequencies = {
+      'C': 261.63, 'C#': 277.18, 'D': 293.66, 'D#': 311.13, 'E': 329.63,
+      'F': 349.23, 'F#': 369.99, 'G': 392.00, 'G#': 415.30, 'A': 440.00,
+      'A#': 466.16, 'B': 493.88, 'C2': 523.25, 'C#2': 554.37, 'D2': 587.33,
+      'D#2': 622.25, 'E2': 659.26, 'F2': 698.46, 'F#2': 739.99, 'G2': 783.99,
+      'G#2': 830.61, 'A2': 880.00, 'A#2': 932.33, 'B2': 987.77
+    };
+
+    const notes = [
+      'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 
+      'C2', 'C#2', 'D2', 'D#2', 'E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2'
+    ];
+
+    const pianoDiv = document.getElementById("piano");
+    notes.forEach((note, index) => {
+      const btn = document.createElement("button");
+      btn.textContent = note;
+      if (note.includes('#')) {
+        btn.classList.add('black-key');
+      }
+      btn.onclick = () => playNote(note);
+      pianoDiv.appendChild(btn);
+    });
+
+    document.getElementById("volume").oninput = (e) => volume = parseFloat(e.target.value);
+    document.getElementById("tempo").oninput = (e) => tempo = parseInt(e.target.value);
+    document.getElementById("pitch").oninput = (e) => pitchShift = parseInt(e.target.value);
+
+    function playNote(noteName) {
+      const baseFreq = noteFrequencies[noteName];
+      const shiftedFreq = baseFreq * Math.pow(2, pitchShift / 12);
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.type = 'square';
+      oscillator.frequency.value = shiftedFreq;
+      gainNode.gain.value = volume;
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + (0.2 * 100 / tempo));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+/* Glassy Search / Go-To inputs */
+/* Import font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Poppins", sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #1e1e1e, #2a2a3d);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    color: #fff;
+}
+
+/* Container centers everything */
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Calculator glass panel */
+.calculator {
+    background: rgba(40, 40, 55, 0.35);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Display area */
+form .display {
+    display: flex;
+    justify-content: flex-end;
+    margin: 15px 0 25px 0;
+}
+
+form .display input {
+    text-align: right;
+    flex: 1;
+    font-size: 2.2rem;
+    background: rgba(255, 255, 255, 0.05);
+    color: #f8f8f8;
+    border: none;
+    outline: none;
+    padding: 12px;
+    border-radius: 10px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Buttons layout */
+.calculator form input[type="button"] {
+    border: none;
+    outline: none;
+    width: 60px;
+    height: 60px;
+    margin: 8px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: all 0.25s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Hover effect */
+.calculator form input[type="button"]:hover {
+    background: rgba(179, 138, 221, 0.25);
+    box-shadow: 0 0 15px rgba(179, 138, 221, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Special operators coloring */
+input[value="AC"], input[value="DE"] {
+    background: rgba(255, 71, 87, 0.25);
+}
+input[value="AC"]:hover, input[value="DE"]:hover {
+    background: rgba(255, 71, 87, 0.4);
+    box-shadow: 0 0 15px rgba(255, 71, 87, 0.6);
+}
+
+input[value="="] {
+    background: rgba(72, 239, 128, 0.25);
+}
+input[value="="]:hover {
+    background: rgba(72, 239, 128, 0.4);
+    box-shadow: 0 0 15px rgba(72, 239, 128, 0.6);
+}
+/* Buttons container in a grid layout */
+.calculator form div {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* space between buttons */
+}
+
+/* Make all buttons the same size and centered */
+.calculator form input[type="button"] {
+    border: none;
+    outline: none;
+    width: 65px;
+    height: 65px;
+    margin: 5px 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-align: center;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08), transparent;
+    border-radius: 12px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: all 0.25s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}

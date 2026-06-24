@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Soccer</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+    }
+    canvas {
+      border: 2px solid white;
+      background: green;
+      display: block;
+      margin: 30px auto;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="800" height="400"></canvas>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const player1 = { x: 30, y: 170, width: 20, height: 20, color: "blue", speed: 7, power: false };
+    const player2 = { x: 750, y: 170, width: 20, height: 20, color: "red", speed: 7, power: false };
+    const ball = { x: 400, y: 200, radius: 10, dx: 5, dy: 3 };
+    let score = { p1: 0, p2: 0 };
+    const keys = {};
+
+    function drawPlayer(p) {
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x, p.y, p.width, p.height);
+    }
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "white";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function drawGoals() {
+      ctx.fillStyle = "yellow";
+      ctx.fillRect(0, 150, 10, 100);
+      ctx.fillRect(790, 150, 10, 100);
+    }
+
+    function drawScore() {
+      ctx.font = "20px Arial";
+      ctx.fillStyle = "white";
+      ctx.fillText(`Player 1: ${score.p1}`, 20, 30);
+      ctx.fillText(`Player 2: ${score.p2}`, 650, 30);
+    }
+
+    function moveBall() {
+        ball.x += ball.dx;
+        ball.y += ball.dy;
+
+        if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+            ball.dy *= -1;
+        }
+
+        if (checkCollision(player1)) {
+            ball.dx = player1.power ? 9 : 5;
+            if (ball.dx < 0) ball.dx *= -1;
+                player1.power = false;
+        }
+
+        if (checkCollision(player2)) {
+            ball.dx = player2.power ? -9 : -5;
+            if (ball.dx > 0) ball.dx *= -1;
+            player2.power = false;
+        }
+
+        if (ball.x - ball.radius < 10 && ball.y > 150 && ball.y < 250) {
+            score.p2++;
+            resetBall();
+        }
+
+        if (ball.x + ball.radius > 790 && ball.y > 150 && ball.y < 250) {
+            score.p1++;
+            resetBall();
+        }
+
+        if (ball.x < -30 || ball.x > canvas.width + 30) {
+            resetBall();
+        }
+    }
+
+    function checkCollision(player) {
+  return (
+    ball.x + ball.radius > player.x &&
+    ball.x - ball.radius < player.x + player.width &&
+    ball.y + ball.radius > player.y &&
+    ball.y - ball.radius < player.y + player.height
+  );
+}
+
+
+    function resetBall() {
+      ball.x = 400;
+      ball.y = 200;
+      ball.dx = 5 * (Math.random() > 0.5 ? 1 : -1);
+      ball.dy = 3 * (Math.random() > 0.5 ? 1 : -1);
+    }
+
+    function movePlayers() {
+      if (keys["w"] && player1.y > 0) player1.y -= player1.speed;
+      if (keys["s"] && player1.y + player1.height < canvas.height) player1.y += player1.speed;
+      if (keys["a"] && player1.x > 0) player1.x -= player1.speed;
+      if (keys["d"] && player1.x + player1.width < canvas.width) player1.x += player1.speed;
+
+      if (keys["ArrowUp"] && player2.y > 0) player2.y -= player2.speed;
+      if (keys["ArrowDown"] && player2.y + player2.height < canvas.height) player2.y += player2.speed;
+      if (keys["ArrowLeft"] && player2.x > 0) player2.x -= player2.speed;
+      if (keys["ArrowRight"] && player2.x + player2.width < canvas.width) player2.x += player2.speed;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawGoals();
+      drawBall();
+      drawPlayer(player1);
+      drawPlayer(player2);
+      drawScore();
+      movePlayers();
+      moveBall();
+      requestAnimationFrame(draw);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      keys[e.key] = true;
+      if (e.key === "q") player1.power = true;
+      if (e.key === "Shift") player2.power = true;
+    });
+
+    document.addEventListener("keyup", (e) => {
+      keys[e.key] = false;
+    });
+
+    draw();
+  </script>
+</body>
+</html>

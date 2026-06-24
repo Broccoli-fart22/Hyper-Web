@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planetary and Moon Time Tracker</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .time-label {
+            font-size: 24px;
+            margin: 10px;
+        }
+
+        .planet-time, .moon-time {
+            margin: 5px 0;
+        }
+
+        .planet-time span, .moon-time span {
+            display: inline-block;
+            min-width: 200px;
+            text-align: right;
+        }
+
+        .separator {
+            font-weight: bold;
+            font-size: 18px;
+            color: #c8aaff;
+        }
+
+        .gradient-panel {
+            background: linear-gradient(to bottom, #333, #000);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .dwarf-planets {
+            margin-top: 20px;
+            color: lightpurple;
+            font-size: 22px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="gradient-panel">
+        <div class="time-label" id="earthTime">Earth Time: </div>
+        <div class="time-label planet-time" id="marsTime">Mars Time: </div>
+        <div class="time-label planet-time" id="saturnTime">Saturn Time: </div>
+        <div class="time-label planet-time" id="venusTime">Venus Time: </div>
+        <div class="time-label planet-time" id="mercuryTime">Mercury Time: </div>
+        <div class="time-label planet-time" id="jupiterTime">Jupiter Time: </div>
+        <div class="time-label planet-time" id="neptuneTime">Neptune Time: </div>
+        <div class="time-label planet-time" id="uranusTime">Uranus Time: </div>
+
+        <div class="separator">--- Dwarf Planets ---</div>
+        <div class="time-label moon-time" id="plutoTime">Pluto Time: </div>
+        <div class="time-label moon-time" id="ceresTime">Ceres Time: </div>
+        <div class="time-label moon-time" id="erisTime">Eris Time: </div>
+        <div class="time-label moon-time" id="haumeaTime">Haumea Time: </div>
+        <div class="time-label moon-time" id="makemakeTime">Makemake Time: </div>
+
+        <div class="separator">--- moons ---</div>
+        <div id="lunaMoonTime" class="moon-time">Luna Time: 00:00:00</div>
+        <div id="ioMoonTime" class="moon-time">Io Moon Time: 00:00:00</div>
+        <div id="titanMoonTime" class="moon-time">Titan Moon Time: 00:00:00</div>
+        <div id="europaMoonTime" class="moon-time">Europa Moon Time: 00:00:00</div>
+        <div id="ganymedeMoonTime" class="moon-time">Ganymede Moon Time: 00:00:00</div>
+        <div id="callistoMoonTime" class="moon-time">Callisto Moon Time: 00:00:00</div>
+        <div id="tritonMoonTime" class="moon-time">Triton Moon Time: 00:00:00</div>
+        <div id="enceladusMoonTime" class="moon-time">Enceladus Moon Time: 00:00:00</div>
+        <div id="rheaMoonTime" class="moon-time">Rhea Moon Time: 00:00:00</div>
+        <div id="dioneMoonTime" class="moon-time">Dione Moon Time: 00:00:00</div>
+        <div id="iapetusMoonTime" class="moon-time">Iapetus Moon Time: 00:00:00</div>
+        <div id="mirandaMoonTime" class="moon-time">Miranda Moon Time: 00:00:00</div>
+        <div id="arielMoonTime" class="moon-time">Ariel Moon Time: 00:00:00</div>
+        <div id="oberonMoonTime" class="moon-time">Oberon Moon Time: 00:00:00</div>
+        <div id="titaniaMoonTime" class="moon-time">Titania Moon Time: 00:00:00</div>
+        <div id="phoebeMoonTime" class="moon-time">Phoebe Moon Time: 00:00:00</div>
+        <div id="charonMoonTime" class="moon-time">Charon Moon Time: 00:00:00</div>
+        <div id="proteusMoonTime" class="moon-time">Proteus Moon Time: 00:00:00</div>
+        <div id="hyperionMoonTime" class="moon-time">Hyperion Moon Time: 00:00:00</div>
+        <div id="umbrielMoonTime" class="moon-time">Umbriel Moon Time: 00:00:00</div>
+    </div>
+
+</div>
+
+<script>
+    const SOL_LENGTH_IN_SECONDS = 24 * 60 * 60 + 39 * 60 + 35;
+    const SATURN_DAY_LENGTH_IN_SECONDS = 10 * 60 * 60 + 33 * 60;
+    const VENUS_DAY_LENGTH_IN_SECONDS = 243 * 24 * 60 * 60;
+    const MERCURY_DAY_LENGTH_IN_SECONDS = Math.round(58.6 * 24 * 60 * 60);
+    const JUPITER_DAY_LENGTH_IN_SECONDS = 9 * 60 * 60 + 55 * 60;
+    const NEPTUNE_DAY_LENGTH_IN_SECONDS = Math.round(16.11 * 60 * 60);
+    const URANUS_DAY_LENGTH_IN_SECONDS = Math.round(17.24 * 60 * 60);
+
+    const PLUTO_DAY_LENGTH_IN_SECONDS = Math.round(153.3 * 60 * 60);
+    const CERES_DAY_LENGTH_IN_SECONDS = Math.round(9.07 * 60 * 60);
+    const ERIS_DAY_LENGTH_IN_SECONDS = Math.round(25.9 * 60 * 60);
+    const HAUMEA_DAY_LENGTH_IN_SECONDS = Math.round(3.9 * 60 * 60);
+    const MAKEMAKE_DAY_LENGTH_IN_SECONDS = Math.round(22.5 * 60 * 60);
+
+    const EARTH_MOON_DAY = 27 * 24 * 60 * 60;
+    const IO_MOON_DAY = 1.77 * 24 * 60 * 60;
+    const TITAN_MOON_DAY = 15.95 * 24 * 60 * 60;
+    const EUROPA_MOON_DAY = 3.55 * 24 * 60 * 60;
+    const GANYMEDE_MOON_DAY = 7.15 * 24 * 60 * 60;
+    const CALLISTO_MOON_DAY = 16.69 * 24 * 60 * 60;
+    const TRITON_MOON_DAY = 5.88 * 24 * 60 * 60;
+    const ENCELADUS_MOON_DAY = 1.37 * 24 * 60 * 60;
+    const RHEA_MOON_DAY = 4.52 * 24 * 60 * 60;
+    const DIONE_MOON_DAY = 2.73 * 24 * 60 * 60;
+    const IAPETUS_MOON_DAY = 79.33 * 24 * 60 * 60;
+    const MIRANDA_MOON_DAY = 1.41 * 24 * 60 * 60;
+    const ARIEL_MOON_DAY = 2.52 * 24 * 60 * 60;
+    const OBERON_MOON_DAY = 13.46 * 24 * 60 * 60;
+    const TITANIA_MOON_DAY = 8.71 * 24 * 60 * 60;
+    const PHOEBE_MOON_DAY = (9 * 60 * 60) + (16 * 60);
+    const CHARON_MOON_DAY = 6.39 * 24 * 60 * 60;
+    const PROTEUS_MOON_DAY = 1.12 * 24 * 60 * 60;
+    const HYPERION_MOON_DAY = 21.28 * 24 * 60 * 60;
+    const UMBRIEL_MOON_DAY = 4.14 * 24 * 60 * 60;
+
+    function formatTimeFromSeconds(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const sec = seconds % 60;
+        return `${pad(hours)}:${pad(minutes)}:${pad(sec)}`;
+    }
+
+    function pad(num) {
+        return num < 10 ? `0${num}` : num;
+    }
+
+    function formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    }
+
+    function updateTimes() {
+        const earthReference = new Date(2000, 0, 1, 12, 0, 0);
+        const earthCurrentTime = new Date();
+        const earthSecondsElapsed = Math.floor((earthCurrentTime - earthReference) / 1000);
+
+        const marsTime = earthSecondsElapsed % SOL_LENGTH_IN_SECONDS;
+        const saturnTime = earthSecondsElapsed % SATURN_DAY_LENGTH_IN_SECONDS;
+        const venusTime = earthSecondsElapsed % VENUS_DAY_LENGTH_IN_SECONDS;
+        const mercuryTime = earthSecondsElapsed % MERCURY_DAY_LENGTH_IN_SECONDS;
+        const jupiterTime = earthSecondsElapsed % JUPITER_DAY_LENGTH_IN_SECONDS;
+        const neptuneTime = earthSecondsElapsed % NEPTUNE_DAY_LENGTH_IN_SECONDS;
+        const uranusTime = earthSecondsElapsed % URANUS_DAY_LENGTH_IN_SECONDS;
+
+        const plutoTime = earthSecondsElapsed % PLUTO_DAY_LENGTH_IN_SECONDS;
+        const ceresTime = earthSecondsElapsed % CERES_DAY_LENGTH_IN_SECONDS;
+        const erisTime = earthSecondsElapsed % ERIS_DAY_LENGTH_IN_SECONDS;
+        const haumeaTime = earthSecondsElapsed % HAUMEA_DAY_LENGTH_IN_SECONDS;
+        const makemakeTime = earthSecondsElapsed % MAKEMAKE_DAY_LENGTH_IN_SECONDS;
+
+        const earthTime = formatTime((earthCurrentTime.getHours()*3600)+(earthCurrentTime.getMinutes()*60)+earthCurrentTime.getSeconds());
+
+        document.getElementById('earthTime').innerHTML = `Earth Time: ${earthTime}`;
+        document.getElementById('marsTime').innerHTML = `Mars Time: ${formatTimeFromSeconds(marsTime)}`;
+        document.getElementById('saturnTime').innerHTML = `Saturn Time: ${formatTimeFromSeconds(saturnTime)}`;
+        document.getElementById('venusTime').innerHTML = `Venus Time: ${formatTimeFromSeconds(venusTime)}`;
+        document.getElementById('mercuryTime').innerHTML = `Mercury Time: ${formatTimeFromSeconds(mercuryTime)}`;
+        document.getElementById('jupiterTime').innerHTML = `Jupiter Time: ${formatTimeFromSeconds(jupiterTime)}`;
+        document.getElementById('neptuneTime').innerHTML = `Neptune Time: ${formatTimeFromSeconds(neptuneTime)}`;
+        document.getElementById('uranusTime').innerHTML = `Uranus Time: ${formatTimeFromSeconds(uranusTime)}`;
+
+        document.getElementById('plutoTime').innerHTML = `Pluto Time: ${formatTimeFromSeconds(plutoTime)}`;
+        document.getElementById('ceresTime').innerHTML = `Ceres Time: ${formatTimeFromSeconds(ceresTime)}`;
+        document.getElementById('erisTime').innerHTML = `Eris Time: ${formatTimeFromSeconds(erisTime)}`;
+        document.getElementById('haumeaTime').innerHTML = `Haumea Time: ${formatTimeFromSeconds(haumeaTime)}`;
+        document.getElementById('makemakeTime').innerHTML = `Makemake Time: ${formatTimeFromSeconds(makemakeTime)}`;
+        
+        const earthMoonTime = Math.floor(Date.now() / 1000) % EARTH_MOON_DAY;
+        const ioMoonTime = Math.floor(Date.now() / 1000) % IO_MOON_DAY;
+        const titanMoonTime = Math.floor(Date.now() / 1000) % TITAN_MOON_DAY;
+        const europaMoonTime = Math.floor(Date.now() / 1000) % EUROPA_MOON_DAY;
+        const ganymedeMoonTime = Math.floor(Date.now() / 1000) % GANYMEDE_MOON_DAY;
+        const callistoMoonTime = Math.floor(Date.now() / 1000) % CALLISTO_MOON_DAY;
+        const tritonMoonTime = Math.floor(Date.now() / 1000) % TRITON_MOON_DAY;
+        const enceladusMoonTime = Math.floor(Date.now() / 1000) % ENCELADUS_MOON_DAY;
+        const rheaMoonTime = Math.floor(Date.now() / 1000) % RHEA_MOON_DAY;
+        const dioneMoonTime = Math.floor(Date.now() / 1000) % DIONE_MOON_DAY;
+        const iapetusMoonTime = Math.floor(Date.now() / 1000) % IAPETUS_MOON_DAY;
+        const mirandaMoonTime = Math.floor(Date.now() / 1000) % MIRANDA_MOON_DAY;
+        const arielMoonTime = Math.floor(Date.now() / 1000) % ARIEL_MOON_DAY;
+        const oberonMoonTime = Math.floor(Date.now() / 1000) % OBERON_MOON_DAY;
+        const titaniaMoonTime = Math.floor(Date.now() / 1000) % TITANIA_MOON_DAY;
+        const phoebeMoonTime = Math.floor(Date.now() / 1000) % PHOEBE_MOON_DAY;
+        const charonMoonTime = Math.floor(Date.now() / 1000) % CHARON_MOON_DAY;
+        const proteusMoonTime = Math.floor(Date.now() / 1000) % PROTEUS_MOON_DAY;
+        const hyperionMoonTime = Math.floor(Date.now() / 1000) % HYPERION_MOON_DAY;
+        const umbrielMoonTime = Math.floor(Date.now() / 1000) % UMBRIEL_MOON_DAY;
+
+        document.getElementById('lunaMoonTime').textContent = `Luna Time: ${formatTime(earthMoonTime)}`;
+        document.getElementById('ioMoonTime').textContent = `Io Moon Time: ${formatTime(ioMoonTime)}`;
+        document.getElementById('titanMoonTime').textContent = `Titan Moon Time: ${formatTime(titanMoonTime)}`;
+        document.getElementById('europaMoonTime').textContent = `Europa Moon Time: ${formatTime(europaMoonTime)}`;
+        document.getElementById('ganymedeMoonTime').textContent = `Ganymede Moon Time: ${formatTime(ganymedeMoonTime)}`;
+        document.getElementById('callistoMoonTime').textContent = `Callisto Moon Time: ${formatTime(callistoMoonTime)}`;
+        document.getElementById('tritonMoonTime').textContent = `Triton Moon Time: ${formatTime(tritonMoonTime)}`;
+        document.getElementById('enceladusMoonTime').textContent = `Enceladus Moon Time: ${formatTime(enceladusMoonTime)}`;
+        document.getElementById('rheaMoonTime').textContent = `Rhea Moon Time: ${formatTime(rheaMoonTime)}`;
+        document.getElementById('dioneMoonTime').textContent = `Dione Moon Time: ${formatTime(dioneMoonTime)}`;
+        document.getElementById('iapetusMoonTime').textContent = `Iapetus Moon Time: ${formatTime(iapetusMoonTime)}`;
+        document.getElementById('mirandaMoonTime').textContent = `Miranda Moon Time: ${formatTime(mirandaMoonTime)}`;
+        document.getElementById('arielMoonTime').textContent = `Ariel Moon Time: ${formatTime(arielMoonTime)}`;
+        document.getElementById('oberonMoonTime').textContent = `Oberon Moon Time: ${formatTime(oberonMoonTime)}`;
+        document.getElementById('titaniaMoonTime').textContent = `Titania Moon Time: ${formatTime(titaniaMoonTime)}`;
+        document.getElementById('phoebeMoonTime').textContent = `Phoebe Moon Time: ${formatTime(phoebeMoonTime)}`;
+        document.getElementById('charonMoonTime').textContent = `Charon Moon Time: ${formatTime(charonMoonTime)}`;
+        document.getElementById('proteusMoonTime').textContent = `Proteus Moon Time: ${formatTime(proteusMoonTime)}`;
+        document.getElementById('hyperionMoonTime').textContent = `Hyperion Moon Time: ${formatTime(hyperionMoonTime)}`;
+        document.getElementById('umbrielMoonTime').textContent = `Umbriel Moon Time: ${formatTime(umbrielMoonTime)}`;
+
+        setInterval(updateTimes, 1000);
+    }
+
+    updateTimes();
+</script>
+</body>
+</html>

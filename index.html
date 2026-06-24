@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HyperWeb</title>
+    <link rel="stylesheet" href="Styles.css">
+</head>
+
+<body>
+    <header>
+        <h1>HyperWeb</h1>
+        <p>Quick access to your favorite tools</p>
+    </header>
+
+    <main class="container">
+        <a href="trans/trans.html" class="btn" data-desc="descriptions/translator.html">Translator</a>
+        <a href="calculator/calculator.html" class="btn" data-desc="descriptions/calculator.html">Calculator</a>
+        <a href="password gen/password.html" class="btn" data-desc="descriptions/passwordgenerator.html">Password Generator</a>
+        <a href="cal/cal.html" class="btn" data-desc="descriptions/calendar.html">Calendar</a>
+        <a href="todo-list/todo.html" class="btn" data-desc="descriptions/to-dolist.html">To-Do List</a>
+        <a href="weather app/weather.html" class="btn" data-desc="descriptions/weatherapp.html">Weather App</a>
+        <a href="time.html" class="btn" data-desc="descriptions/time.html">P.&.M.T.T</a>
+        <a href="piano.html" class="btn" data-desc="descriptions/Piano.html">Piano</a>
+        <a href="maps.html" class="btn" data-desc="descriptions/maps.html">Maps</a>
+        <a href="game.html" class="btn" data-desc="descriptions/game.html">Games</a>
+        <button class="btn" onclick="showCredits()">Credits</button>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 HyperWeb — All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Add right-click event for buttons
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('contextmenu', function (e) {
+                e.preventDefault(); // Stop normal right-click menu
+                const descPage = this.getAttribute('data-desc');
+                if (descPage) {
+                    window.open(descPage, '_blank'); // Open description in new tab
+                }
+            });
+        });
+
+        
+function showCredits() {
+    alert(`HyperWeb©
+
+    By Azraf & Karthik: The CEO's and Main progamers
+
+    Server Hosting: Troy
+    Testing: Usman
+    Sales Director: Punith`
+    );
+}
+
+    </script>
+
+</body>
+
+</html>

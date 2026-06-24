@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+:root {
+    --bg: #0b0f14;
+    --panel: rgba(15, 23, 32, 0.85);
+    --muted: #9aa6b2;
+    --accent: #7c5cff;
+    --accent-2: #5ac7ff;
+    --border: rgba(255, 255, 255, 0.08);
+    --glow: 0 8px 24px rgba(124, 92, 255, 0.15);
+    --radius: 12px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: linear-gradient(180deg, var(--bg), #071017 120%);
+    color: #e6eef6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    animation: fadeIn 0.8s ease-out both;
+}
+
+/* Container */
+.container {
+    background: var(--panel);
+    backdrop-filter: blur(12px);
+    padding: 24px;
+    border-radius: var(--radius);
+    width: 350px;
+    box-shadow: var(--glow);
+    text-align: center;
+}
+
+/* Title */
+h1 {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+    margin-bottom: 16px;
+}
+
+/* Input area */
+.input-container {
+    display: flex;
+    gap: 10px;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 14px;
+    outline: none;
+    background: rgba(255, 255, 255, 0.05);
+    color: #dff3ff;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 6px rgba(124, 92, 255, 0.4);
+}
+
+/* Add button */
+button {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    border: none;
+    color: #061223;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(124, 92, 255, 0.4);
+}
+
+/* Task list */
+ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+li {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Task text */
+.task-text {
+    flex: 1;
+    margin-right: 10px;
+    color: #fff;
+}
+
+/* Edit & delete buttons */
+.edit, .delete {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-left: 5px;
+    transition: color 0.25s ease;
+}
+
+.edit:hover {
+    color: var(--accent-2);
+}
+
+.delete:hover {
+    color: #ff4d4d;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
